@@ -1,0 +1,94 @@
+创建地铁站节点
+LOAD CSV WITH HEADERS FROM 'file:///node.csv' AS line
+create(:Station:苏州地铁{ID:line.ID,地铁站名称:line.地铁站名称,序号:line.序号,英文名称:line.英文名称,是否换乘站:line.是否换乘站,poiID:line.poiID})
+
+分别创建一号线、二号线、三号线、四号线、四号线支线、五号线、十一号线
+LOAD CSV WITH HEADERS FROM 'file:///一号线.csv' AS row
+MATCH (node1:Station {ID: row.起始节点})
+MATCH (node2:Station {ID: row.目标节点})
+MERGE (node1)-[connection:CONNECTED_TO {line: row.所在路线}]-(node2)
+SET connection.direction = "forward", connection.起始站 = row.起始站, connection.终点站 = row.终点站
+MERGE (node2)-[reverse_connection:CONNECTED_TO {line: row.所在路线}]->(node1)
+SET reverse_connection.direction = "backward", connection.起始站 = row.终点站, connection.终点站 = row.起始站
+
+LOAD CSV WITH HEADERS FROM 'file:///二号线.csv' AS row
+MATCH (node1:Station {ID: row.起始节点})
+MATCH (node2:Station {ID: row.目标节点})
+MERGE (node1)-[connection:CONNECTED_TO {line: row.所在路线}]-(node2)
+SET connection.direction = "forward", connection.起始站 = row.起始站, connection.终点站 = row.终点站
+MERGE (node2)-[reverse_connection:CONNECTED_TO {line: row.所在路线}]->(node1)
+SET reverse_connection.direction = "backward", connection.起始站 = row.终点站, connection.终点站 = row.起始站
+
+LOAD CSV WITH HEADERS FROM 'file:///三号线.csv' AS row
+MATCH (node1:Station {ID: row.起始节点})
+MATCH (node2:Station {ID: row.目标节点})
+MERGE (node1)-[connection:CONNECTED_TO {line: row.所在路线}]-(node2)
+SET connection.direction = "forward", connection.起始站 = row.起始站, connection.终点站 = row.终点站
+MERGE (node2)-[reverse_connection:CONNECTED_TO {line: row.所在路线}]->(node1)
+SET reverse_connection.direction = "backward", connection.起始站 = row.终点站, connection.终点站 = row.起始站
+
+LOAD CSV WITH HEADERS FROM 'file:///四号线.csv' AS row
+MATCH (node1:Station {ID: row.起始节点})
+MATCH (node2:Station {ID: row.目标节点})
+MERGE (node1)-[connection:CONNECTED_TO {line: row.所在路线}]-(node2)
+SET connection.direction = "forward", connection.起始站 = row.起始站, connection.终点站 = row.终点站
+MERGE (node2)-[reverse_connection:CONNECTED_TO {line: row.所在路线}]->(node1)
+SET reverse_connection.direction = "backward", connection.起始站 = row.终点站, connection.终点站 = row.起始站
+
+LOAD CSV WITH HEADERS FROM 'file:///四号线支线.csv' AS row
+MATCH (node1:Station {ID: row.起始节点})
+MATCH (node2:Station {ID: row.目标节点})
+MERGE (node1)-[connection:CONNECTED_TO {line: row.所在路线}]-(node2)
+SET connection.direction = "forward", connection.起始站 = row.起始站, connection.终点站 = row.终点站
+MERGE (node2)-[reverse_connection:CONNECTED_TO {line: row.所在路线}]->(node1)
+SET reverse_connection.direction = "backward", connection.起始站 = row.终点站, connection.终点站 = row.起始站
+
+LOAD CSV WITH HEADERS FROM 'file:///五号线.csv' AS row
+MATCH (node1:Station {ID: row.起始节点})
+MATCH (node2:Station {ID: row.目标节点})
+MERGE (node1)-[connection:CONNECTED_TO {line: row.所在路线}]-(node2)
+SET connection.direction = "forward", connection.起始站 = row.起始站, connection.终点站 = row.终点站
+MERGE (node2)-[reverse_connection:CONNECTED_TO {line: row.所在路线}]->(node1)
+SET reverse_connection.direction = "backward", connection.起始站 = row.终点站, connection.终点站 = row.起始站
+
+LOAD CSV WITH HEADERS FROM 'file:///十一号线.csv' AS row
+MATCH (node1:Station {ID: row.起始节点})
+MATCH (node2:Station {ID: row.目标节点})
+MERGE (node1)-[connection:CONNECTED_TO {line: row.所在路线}]-(node2)
+SET connection.direction = "forward", connection.起始站 = row.起始站, connection.终点站 = row.终点站
+MERGE (node2)-[reverse_connection:CONNECTED_TO {line: row.所在路线}]->(node1)
+SET reverse_connection.direction = "backward", connection.起始站 = row.终点站, connection.终点站 = row.起始站
+
+
+查询名称为“乐桥”的节点：
+MATCH (n:Station{地铁站名称:'乐桥'}) 
+RETURN n
+
+
+查询二号线的所有节点：
+MATCH (n1)-[connection:CONNECTED_TO {line: '二号线'}]-(n2)
+RETURN n1, connection, n2
+
+查询乐桥所有的邻接站点：
+MATCH (n:Station{地铁站名称:'乐桥'}) -- (m:Station)
+RETURN n,m
+
+查询“乐桥”与“双桥”之间的所有路线：
+MATCH p=({地铁站名称: "乐桥"})-[:CONNECTED_TO*1..6]-({地铁站名称: "双桥"})
+WHERE all(r IN relationships(p) WHERE r.direction = "forward")
+RETURN p
+
+查询“广济南路”到“狮子山”之间的所有路线：
+MATCH p=({地铁站名称: "乐桥"})-[:CONNECTED_TO*1..6]-({地铁站名称: "双桥"})
+WHERE all(r IN relationships(p) WHERE r.direction = "forward")
+RETURN p
+
+查询“广济南路”到“狮子山”之间的最短路线：
+MATCH p = shortestPath((start:Station{地铁站名称:"广济南路"}) -[:CONNECTED_TO*..20]- (end:Station{地铁站名称:"狮子山"}))
+RETURN p
+
+
+
+
+
+
