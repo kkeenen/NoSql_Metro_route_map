@@ -17,8 +17,9 @@ json.txt       --苏州地铁的json数据，下载自高德地图
 
 node.csv       --苏州地铁各个节点数据
 
-N号线_test.csv -- 苏州各个地铁线路信息
+N号线_test.csv --苏州各个地铁线路信息
 
+result.png     --结果图
 
 ## 还存在的问题：
 
